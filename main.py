@@ -47,7 +47,7 @@ def main():
         add_code_review_comment(repo, pull_request_number, comment_body)
 
         # Create new commit for the README update
-        update_readme_in_existing_pr(repo, updated_readme, readme_content.sha, pull_request_branch_name)
+        update_readme_in_existing_pr(repo, updated_readme, pull_request_branch_name)
 
 if __name__ == '__main__':
     main()
