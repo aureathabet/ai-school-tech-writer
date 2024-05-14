@@ -40,6 +40,7 @@ jobs:
       - name: Generate Updated README
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.BLOOMTECH_GITHUB_TOKEN }}
           REPO_PATH: ${{ github.repository }}
           PR_NUMBER: ${{ env.pull_request_number }}
