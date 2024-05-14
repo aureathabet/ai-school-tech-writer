@@ -9,6 +9,10 @@ from langsmith.wrappers import wrap_openai
 from langsmith import traceable
 from constants import *
 
+PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
+print("PINECONE_API_KEY:", PINECONE_API_KEY)
+
+
 def format_data_for_openai(diffs, readme_content, commit_messages):
     prompt = None
 
@@ -54,7 +58,7 @@ def call_openai(prompt, context):
         # Adding context to our prompt
         embeddings = OpenAIEmbeddings(model=EMBEDDING_MODEL)
 
-        document_vectorstore = PineconeVectorStore(pinecone_api_key=os.getenv("PINECONE_API_KEY"), index_name=PINECONE_INDEX, embedding=embeddings)
+        document_vectorstore = PineconeVectorStore(pinecone_api_key=PINECONE_API_KEY, index_name=PINECONE_INDEX, embedding=embeddings)
         retriever = document_vectorstore.as_retriever()
         context = retriever.get_relevant_documents(prompt)
 
