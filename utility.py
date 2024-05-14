@@ -31,13 +31,13 @@ def format_data_for_openai(diffs, readme_content, commit_messages):
 
     prompt_readme = (
         f"{base_prompt}"
-        "Consider the code changes and commit messages, and determine if the README needs to be updated. If so, edit the README, ensuring to maintain its existing style and clarity.\n"
+        "Consider the code changes and commit messages, and determine if the README needs to be updated. If so, edit the README, ensuring to maintain its existing style and clarity. Do not perform a code review.\n"
         "Updated README:\n"
     )
 
     prompt_review = (
         f"{base_prompt}"
-        "Consider the code changes and commit messages, and perform a basic code review based on the changes. If you have any questions or suggested improvements, please leave a comment on the pull request. Do not include README update suggestions.\n"
+        "Consider the code changes and commit messages, and perform a basic code review. If you have any questions or suggested improvements, please leave a concise comment on the pull request. Never include suggestions for updating the README.\n"
         "Code Review Comments:\n"
     )
 
