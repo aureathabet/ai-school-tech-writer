@@ -37,7 +37,7 @@ def format_data_for_openai(diffs, readme_content, commit_messages):
 
     prompt_review = (
         f"{base_prompt}"
-        "Consider the code changes and commit messages, and perform a basic code review based on the changes. If you have any questions or suggested improvements, please leave a comment on the pull request.\n"
+        "Consider the code changes and commit messages, and perform a basic code review based on the changes. If you have any questions or suggested improvements, please leave a comment on the pull request. Do not include README update suggestions.\n"
         "Code Review Comments:\n"
     )
 
