@@ -37,7 +37,7 @@ def format_data_for_openai(diffs, readme_content, commit_messages):
 
     prompt_review = (
         f"{base_prompt}"
-        "Consider the code changes and commit messages, and perform a basic code review based on the changes. If you have any questions or suggested improvements, please leave a comment on the pull request.\n"
+        "Consider the code changes and commit messages, and perform a basic code review based on the changes. If you have any questions or suggested improvements, please leave a comment on the pull request. Do not include README update suggestions.\n"
         "Code Review Comments:\n"
     )
 
@@ -59,11 +59,15 @@ def call_openai(prompt):
         print(f"Error making LLM: {e}")
         return "An error occurred while processing the request. Please try again later."
     
-def update_readme_in_existing_pr(repo, updated_readme, readme_sha, pr_branch_name):
+def update_readme_in_existing_pr(repo, updated_readme, pr_branch_name):
     commit_message = "AI COMMIT: Proposed README update based on recent code changes."
 
+    # Fetch the latest README.md file to get the current SHA
+    contents = repo.get_contents("README.md", ref=pr_branch_name)
+    current_sha = contents.sha
+
     # Update the README.md file directly in the existing PR branch
-    repo.update_file("README.md", commit_message, updated_readme, readme_sha, branch=pr_branch_name)
+    repo.update_file("README.md", commit_message, updated_readme, current_sha, pr_branch_name)
 
 def add_code_review_comment(repo, pr_number, comment_body):
     """
@@ -76,3 +80,55 @@ def add_code_review_comment(repo, pr_number, comment_body):
     """
     pull_request = repo.get_pull(pr_number)
     pull_request.create_issue_comment(comment_body)
+
+def get_pr_labels(repo, pr_number):
+    """
+    Retrieves the labels associated with a specified pull request.
+
+    Args:
+    repo (Repository): The repository object from the GitHub API.
+    pr_number (int): The number of the pull request from which to retrieve labels.
+
+    Returns:
+    list: A list of label names associated with the pull request.
+    """
+    pull_request = repo.get_pull(pr_number)
+    return [label.name for label in pull_request.labels]
+
+def merge_pull_request(repo, pr_number, commit_title, commit_message, merge_method='merge'):
+    """
+    Merges a specified pull request.
+
+    Args:
+    repo (Repository): The repository object from the GitHub API.
+    pr_number (int): The number of the pull request to merge.
+    commit_title (str): The title for the commit message.
+    commit_message (str): The detailed commit message.
+    merge_method (str): The method of merging (merge, squash, or rebase).
+
+    Returns:
+    bool: True if the merge was successful, False otherwise.
+    """
+    try:
+        pull_request = repo.get_pull(pr_number)
+        pull_request.merge(commit_title=commit_title, commit_message=commit_message, merge_method=merge_method)
+        return True
+    except Exception as e:
+        print(f"Failed to merge PR: {e}")
+        return False
+    
+
+
+def notify_user_for_merge(repo, pr_number, user_login):
+    """
+    Notifies the GitHub user when the action has been completed and the PR is ready to be merged.
+
+    Args:
+    repo (Repository): The repository object from the GitHub API.
+    pr_number (int): The number of the pull request.
+    user_login (str): The GitHub login of the user to notify.
+    """
+    issue = repo.get_issue(pr_number)
+    notification_message = f"@{user_login}, the automated checks are complete and the PR is ready to be merged. Please review the changes."
+    issue.create_comment(notification_message)
+

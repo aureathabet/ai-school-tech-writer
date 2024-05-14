@@ -43,6 +43,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.BLOOMTECH_GITHUB_TOKEN }}
           REPO_PATH: ${{ github.repository }}
           PR_NUMBER: ${{ env.pull_request_number }}
+          PR_BRANCH_NAME: ${{ github.head_ref }}
           COMMIT_SHA: $${{ env.commit_sha }}
         run: python main.py
       
