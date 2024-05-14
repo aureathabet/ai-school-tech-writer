@@ -48,6 +48,7 @@ def main():
             # Create new commit for the README update
             updated_readme = call_openai(prompt_readme, False)
             update_readme_in_existing_pr(repo, updated_readme, pull_request_branch_name)
-
+            # dummy commit to trigger the workflow
+            
 if __name__ == '__main__':
     main()
