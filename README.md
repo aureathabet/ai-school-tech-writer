@@ -1,129 +1,108 @@
-## Code Review
+### Code Review
 
-### Overview
-The changes in this pull request bring significant improvements to the automation workflow for updating the README and performing code reviews. The enhancements include broader trigger conditions, better handling of environment variables, and new utility functions to support future automation features. The commits are well-documented, and the updated README provides a clear and comprehensive overview of the project's setup, usage, and features.
+#### 1. Code Changes in `.github/workflows/update_readme.yaml`
 
-### Workflow File Changes (`.github/workflows/update_readme.yaml`)
+- **Environment Variables**:
+  - Added `PINECONE_API_KEY` to the environment variables to support the new integration with Pinecone.
 
-1. **Trigger Events**:
-   - The workflow now also triggers on `synchronize` and `reopened` events, broadening the scope for automation. This ensures the workflow runs in more scenarios where pull requests are updated.
+#### 2. Code Changes in `.gitignore`
 
-2. **Job Execution Condition**:
-   - The job now runs if the pull request is not merged (`github.event.pull_request.merged == false`). This change ensures that README updates and code reviews are performed before merging, which is typically when they are most needed.
+- **Ignored Files**:
+  - Added `standards` directory and `.env` file to the `.gitignore` to prevent them from being tracked by git.
 
-3. **Environment Variables**:
-   - Added `PR_BRANCH_NAME` to the list of environment variables. This allows the automation scripts to know the branch name of the pull request, which is useful for updating the README in the correct branch.
+#### 3. Code Changes in `constants.py`
 
-### Main Script Changes (`main.py`)
+- **New Constants**:
+  - Added `EMBEDDING_MODEL` and `PINECONE_INDEX` to support the new embedding and vector store functionalities.
 
-1. **Environment Variable Extraction**:
-   - The script now extracts the `PR_BRANCH_NAME` from the environment variables, allowing it to know the branch name of the pull request.
+#### 4. Code Changes in `main.py`
 
-2. **Conditional Code Review**:
-   - The script now checks if the only changed file is `README.md`. If so, it skips adding code review comments to avoid unnecessary comments when only the README is updated.
+- **Integration with Pinecone**:
+  - Modified the `call_openai` function to handle context retrieval using Pinecone.
+  - Ensured that the README update is generated only if necessary, and added a dummy commit to trigger the workflow.
 
-3. **README Update**:
-   - The `update_readme_in_existing_pr` function now uses the `PR_BRANCH_NAME` to update the README directly in the existing PR branch.
+#### 5. Code Changes in `requirements.txt`
 
-### Utility Script Changes (`utility.py`)
+- **New Dependencies**:
+  - Added `langchain-pinecone` and `pinecone-client` for the Pinecone integration.
+  - Added `pypdf` and `python-dotenv` for PDF loading and environment variable management.
 
-1. **Review Prompt**:
-   - The review prompt was updated to exclude README update suggestions. This helps in focusing the review comments on actual code changes.
+#### 6. New File `upload.py`
 
-2. **Update README Function**:
-   - The `update_readme_in_existing_pr` function was modified to dynamically fetch the latest `README.md` SHA from the PR branch. This ensures the script is always working with the latest version of the file.
+- **Document Upload Script**:
+  - Creates a script to load PDF documents from the `standards` directory, split them into chunks, and upload them to Pinecone for vector storage.
 
-3. **New Functions**:
-   - `get_pr_labels`: Retrieves labels associated with a PR.
-   - `merge_pull_request`: Merges a specified PR using the chosen method (merge, squash, or rebase).
-   - `notify_user_for_merge`: Notifies the user when the PR is ready to be merged.
+#### 7. Code Changes in `utility.py`
 
-### Commit Messages
+- **Prompt Handling**:
+  - Modified the `call_openai` function to include context retrieval using Pinecone.
+  - Updated the `format_data_for_openai` function to include the system prompt in the base prompt.
 
-- The commit messages are clear and descriptive, reflecting the changes made in the code. They include additions and updates to the workflow, new functions for future automation features, and fine-tuning of prompts and conditions.
+### Updated README Content
 
-## Updated README Content
+The updated README should reflect the new functionalities and integrations introduced by the recent code changes.
 
-```markdown
-# AI-School Tech Writer
+#### 1. Overview
 
-## Overview
+- **Updated Description**:
+  - Clearly state the purpose of the repository and the new integration with Pinecone for document storage and retrieval.
 
-This repository contains automated tools and workflows to assist in generating and updating README files based on code changes and commit messages.
+#### 2. Features
 
-## Features
+- **Automated README Updates**:
+  - Describe the automatic updating of the README file.
+- **Automated Code Review**:
+  - Outline the use of OpenAI for basic code reviews.
+- **Pull Request Labels**:
+  - Mention the retrieval and processing of PR labels.
+- **Automated Merge Notifications**:
+  - Detail the notification system for when a PR is ready to be merged.
+- **Document Storage and Retrieval**:
+  - Introduce the new feature of storing and retrieving documents using Pinecone.
 
-- **Automated README Updates**: Automatically updates the README file when a pull request is opened, edited, or synchronized.
-- **Automated Code Review**: Uses OpenAI to perform basic code reviews and leave comments on pull requests.
-- **Pull Request Labels**: Retrieves and processes labels associated with pull requests.
-- **Automated Merge Notifications**: Notifies users when a pull request is ready to be merged after automated checks.
+#### 3. Workflow
 
-## Workflow
+- **Trigger Events**:
+  - List the events that trigger the workflow, including the newly added `synchronize` and `reopened`.
+- **Job Execution Condition**:
+  - Specify the condition for the job to run.
+- **Environment Variables**:
+  - Describe the newly added `PR_BRANCH_NAME`, `PINECONE_API_KEY`, `EMBEDDING_MODEL`, and `PINECONE_INDEX`.
 
-The `.github/workflows/update_readme.yaml` file defines a GitHub Actions workflow that triggers on various pull request events such as opened, edited, ready_for_review, synchronize, and reopened.
+#### 4. Key Functions and Scripts
 
-### Key Changes in Workflow
-
-- **Trigger Events**: The workflow now triggers on `synchronize` and `reopened` events in addition to the existing ones.
-- **Job Execution Condition**: The job now runs if the pull request is not merged (`github.event.pull_request.merged == false`).
-- **Environment Variables**: Extracts additional environment variables like PR branch name (`PR_BRANCH_NAME`).
-
-### Key Functions and Scripts
-
-- **main.py**: 
-  - Extracts repository path, PR number, and branch name from environment variables.
-  - Performs code review and updates the README in the existing PR branch.
-
+- **main.py**:
+  - Extraction of environment variables.
+  - Conditional code review based on file changes.
+  - README update in the PR branch.
+  - Integration with Pinecone for context retrieval.
 - **utility.py**:
-  - `format_data_for_openai()`: Formats data for OpenAI with a prompt that excludes README update suggestions.
-  - `update_readme_in_existing_pr()`: Updates the README file in the existing PR branch.
-  - `get_pr_labels()`: Retrieves labels associated with a PR.
-  - `merge_pull_request()`: Merges a specified PR using a specified method (merge, squash, or rebase).
-  - `notify_user_for_merge()`: Notifies the user when the PR is ready to be merged.
+  - New and updated functions (`format_data_for_openai()`, `update_readme_in_existing_pr()`, `get_pr_labels()`, `merge_pull_request()`, `notify_user_for_merge()`, `call_openai()` with context retrieval).
+- **upload.py**:
+  - Script to load and upload documents to Pinecone.
 
-## Setup
+#### 5. Setup
 
-### Prerequisites
+- **Prerequisites**:
+  - List required dependencies including the new ones.
+- **Installation**:
+  - Provide step-by-step installation instructions.
+- **Environment Variables**:
+  - List required environment variables, including `PINECONE_API_KEY`, `EMBEDDING_MODEL`, and `PINECONE_INDEX`.
 
-- Python 3.11
-- GitHub Personal Access Token with repository permissions
+#### 6. Usage
 
-### Installation
+- **Running the Script**:
+  - Provide the command to run the main script.
+  - Include instructions to use the `upload.py` script for uploading documents to Pinecone.
 
-1. Clone the repository:
-   ```sh
-   git clone https://github.com/aureathabet/ai-school-tech-writer.git
-   cd ai-school-tech-writer
-   ```
+#### 7. Contributing
 
-2. Install dependencies:
-   ```sh
-   pip install -r requirements.txt
-   ```
+- **Guidelines**:
+  - Encourage contributions and point to the CONTRIBUTING guidelines.
 
-3. Set up environment variables:
-   - `GITHUB_TOKEN`: Your GitHub personal access token.
-   - `REPO_PATH`: The repository path (e.g., `username/repo`).
-   - `PR_NUMBER`: The pull request number.
-   - `PR_BRANCH_NAME`: The pull request branch name.
-   - `COMMIT_SHA`: The commit SHA.
+### Summary
 
-### Usage
+The code changes and commit messages are well-documented and align with the changes made. The updated README provides clear and comprehensive instructions, accurately reflecting the new functionalities and improvements. The changes ensure that the automation process is more robust and user-friendly, with clear separation of tasks for updating the README, performing code reviews, and managing document storage and retrieval using Pinecone.
 
-Run the main script to trigger the automated README update and code review:
-```sh
-python main.py
-```
-
-## Contributing
-
-We welcome contributions! Please read our [CONTRIBUTING](CONTRIBUTING.md) guidelines before submitting a pull request.
-
----
-
-This updated README provides a clear overview of the new workflow, functions, and setup instructions, while maintaining the existing style and clarity. If you need further adjustments or additional sections, please let me know!
-```
-
-## Summary
-
-The code changes introduce new functionalities and improve the existing workflow for automated README updates and code reviews. The updated README accurately reflects these changes, providing clear instructions on setup, usage, and new features. The commit messages are well-documented and align with the changes made in the code.
+No further updates to the README are needed beyond those provided. The changes have maintained the existing style and clarity of the documentation.
