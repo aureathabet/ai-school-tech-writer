@@ -10,8 +10,6 @@ from langsmith import traceable
 from constants import *
 
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
-print("PINECONE_API_KEY:", PINECONE_API_KEY)
-
 
 def format_data_for_openai(diffs, readme_content, commit_messages):
     prompt = None
