@@ -10,6 +10,7 @@ def main():
     # Get the repo path and PR number from the environment variables
     repo_path = os.getenv('REPO_PATH')
     pull_request_number = int(os.getenv('PR_NUMBER'))
+    pull_request_branch_name = os.getenv('PR_BRANCH_NAME')
     
     # Get the repo object
     repo = g.get_repo(repo_path)
@@ -44,7 +45,7 @@ def main():
     add_code_review_comment(repo, pull_request_number, comment_body)
 
     # Create PR for Updated PR
-    update_readme_in_existing_pr(repo, updated_readme, readme_content.sha)
+    update_readme_in_existing_pr(repo, updated_readme, readme_content.sha, pull_request_branch_name)
 
 if __name__ == '__main__':
     main()
