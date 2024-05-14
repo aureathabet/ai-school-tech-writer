@@ -1,7 +1,37 @@
-Based on the code changes and commit messages provided in the GitHub pull request, the README needs to be updated to reflect the new automation workflow, additional functions, and any new dependencies or environment variables used. Here's an updated version of the README:
+## Code Review Summary
+
+### Workflow File Changes (`.github/workflows/update_readme.yaml`)
+1. **Trigger Events**:
+   - Added `synchronize` and `reopened` events to trigger the workflow.
+2. **Job Execution Condition**:
+   - Changed the condition to run the job if the pull request is not merged (`github.event.pull_request.merged == false`).
+3. **Environment Variables**:
+   - Added `PR_BRANCH_NAME` to the list of environment variables passed to the Python script.
+
+### Main Script Changes (`main.py`)
+1. **Environment Variable Extraction**:
+   - Added extraction of `PR_BRANCH_NAME`.
+2. **Conditional Code Review**:
+   - Added condition to check if the only changed file is `README.md`. If not, perform the code review and update the README in the existing PR branch.
+
+### Utility Script Changes (`utility.py`)
+1. **Review Prompt**:
+   - Updated the review prompt to exclude README update suggestions.
+2. **Update README Function**:
+   - Modified `update_readme_in_existing_pr` to dynamically fetch the latest `README.md` SHA from the PR branch.
+3. **New Functions**:
+   - Added `get_pr_labels` to retrieve labels associated with a PR.
+   - Added `merge_pull_request` to merge a specified PR.
+   - Added `notify_user_for_merge` to notify the user when the PR is ready to be merged.
+
+### Commit Messages
+- The commit messages are clear and reflect the changes made in the code. They include additions and updates to the workflow, new functions for future automation features, and fine-tuning of prompts and conditions.
 
 ---
 
+## Updated README Content
+
+```markdown
 # AI-School Tech Writer
 
 ## Overview
@@ -79,3 +109,7 @@ We welcome contributions! Please read our [CONTRIBUTING](CONTRIBUTING.md) guidel
 ---
 
 This updated README provides a clear overview of the new workflow, functions, and setup instructions, while maintaining the existing style and clarity. If you need further adjustments or additional sections, please let me know!
+```
+
+## Summary
+The code changes introduce new functionalities and improve the existing workflow for automated README updates and code reviews. The updated README accurately reflects these changes, providing clear instructions on setup, usage, and new features. The commit messages are well-documented and align with the changes made in the code.
