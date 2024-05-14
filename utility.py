@@ -2,9 +2,12 @@ import os
 import base64
 from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers.string import StrOutputParser
+from langchain.prompts.prompt import PromptTemplate
+from langchain_pinecone import PineconeVectorStore
+from langchain_openai import OpenAIEmbeddings
 from langsmith.wrappers import wrap_openai
 from langsmith import traceable
-from constants import MODEL, SYSTEM_PROMPT
+from constants import *
 
 def format_data_for_openai(diffs, readme_content, commit_messages):
     prompt = None
@@ -20,6 +23,7 @@ def format_data_for_openai(diffs, readme_content, commit_messages):
 
     # Construct the prompt with clear instructions for the LLM.
     base_prompt = (
+        SYSTEM_PROMPT + "\n"
         "Please review the following code changes and commit messages from a GitHub pull request:\n"
         "Code changes from Pull Request:\n"
         f"{changes}\n"
@@ -43,21 +47,36 @@ def format_data_for_openai(diffs, readme_content, commit_messages):
 
     return prompt_readme, prompt_review
 
-def call_openai(prompt):
+def call_openai(prompt, context):
     client = ChatOpenAI(api_key=os.getenv("OPENAI_API_KEY"), model=MODEL)
 
-    try:
-        messages = [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": prompt},
-        ]
+    if context:
+        # Adding context to our prompt
+        embeddings = OpenAIEmbeddings(model=EMBEDDING_MODEL)
 
-        response = client.invoke(input=messages)
-        parser = StrOutputParser()
-        return parser.invoke(input=response)
-    except Exception as e:
-        print(f"Error making LLM: {e}")
-        return "An error occurred while processing the request. Please try again later."
+        document_vectorstore = PineconeVectorStore(index_name=PINECONE_INDEX, embedding=embeddings)
+        retriever = document_vectorstore.as_retriever()
+        context = retriever.get_relevant_documents(prompt)
+
+        template = PromptTemplate(template="{query} Context: {context}", input_variables=["query", "context"])
+        prompt_with_context = template.invoke({"query": prompt, "context": context})
+        
+        results = client.invoke(prompt_with_context)
+        return results.content
+    else:
+        try:
+            messages = [
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": prompt},
+            ]
+        
+            response = client.invoke(input=messages)
+            parser = StrOutputParser()
+            return parser.invoke(input=response)
+        except Exception as e:
+            print(f"Error making LLM: {e}")
+            return "An error occurred while processing the request. Please try again later."
+    
     
 def update_readme_in_existing_pr(repo, updated_readme, pr_branch_name):
     commit_message = "AI COMMIT: Proposed README update based on recent code changes."
