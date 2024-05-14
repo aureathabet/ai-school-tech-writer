@@ -112,3 +112,19 @@ def merge_pull_request(repo, pr_number, commit_title, commit_message, merge_meth
     except Exception as e:
         print(f"Failed to merge PR: {e}")
         return False
+    
+
+
+def notify_user_for_merge(repo, pr_number, user_login):
+    """
+    Notifies the GitHub user when the action has been completed and the PR is ready to be merged.
+
+    Args:
+    repo (Repository): The repository object from the GitHub API.
+    pr_number (int): The number of the pull request.
+    user_login (str): The GitHub login of the user to notify.
+    """
+    issue = repo.get_issue(pr_number)
+    notification_message = f"@{user_login}, the automated checks are complete and the PR is ready to be merged. Please review the changes."
+    issue.create_comment(notification_message)
+
