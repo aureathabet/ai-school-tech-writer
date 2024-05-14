@@ -40,14 +40,16 @@ def main():
     # Call OpenAI to generate the updated README content
     updated_readme = call_openai(prompt_readme)
 
-    # Check if the only changed file is README.md
-    if not all(file['filename'] == 'README.md' for file in pull_request_diffs):
-        # Add code review comments
-        comment_body = call_openai(prompt_review)
-        add_code_review_comment(repo, pull_request_number, comment_body)
+    # Check if the last commit message is not an automated update
+    if commit_messages[-1] != "AI COMMIT: Proposed README update based on recent code changes.":
+        # Check if the only changed file is README.md
+        if not all(file['filename'] == 'README.md' for file in pull_request_diffs):
+            # Add code review comments
+            comment_body = call_openai(prompt_review)
+            add_code_review_comment(repo, pull_request_number, comment_body)
 
-        # Create new commit for the README update
-        update_readme_in_existing_pr(repo, updated_readme, pull_request_branch_name)
+            # Create new commit for the README update
+            update_readme_in_existing_pr(repo, updated_readme, pull_request_branch_name)
 
 if __name__ == '__main__':
     main()
