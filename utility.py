@@ -59,11 +59,15 @@ def call_openai(prompt):
         print(f"Error making LLM: {e}")
         return "An error occurred while processing the request. Please try again later."
     
-def update_readme_in_existing_pr(repo, updated_readme, readme_sha, pr_branch_name):
+def update_readme_in_existing_pr(repo, updated_readme, pr_branch_name):
     commit_message = "AI COMMIT: Proposed README update based on recent code changes."
 
+    # Fetch the latest README.md file to get the current SHA
+    contents = repo.get_contents("README.md", ref=pr_branch_name)
+    current_sha = contents.sha
+
     # Update the README.md file directly in the existing PR branch
-    repo.update_file("README.md", commit_message, updated_readme, readme_sha, pr_branch_name)
+    repo.update_file("README.md", commit_message, updated_readme, current_sha, pr_branch_name)
 
 def add_code_review_comment(repo, pr_number, comment_body):
     """
