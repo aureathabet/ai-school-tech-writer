@@ -1,33 +1,43 @@
-## Code Review Summary
+## Code Review
 
 ### Workflow File Changes (`.github/workflows/update_readme.yaml`)
+
 1. **Trigger Events**:
-   - Added `synchronize` and `reopened` events to trigger the workflow.
+   - The workflow now also triggers on `synchronize` and `reopened` events, broadening the scope for automation. This ensures the workflow runs in more scenarios where pull requests are updated.
+
 2. **Job Execution Condition**:
-   - Changed the condition to run the job if the pull request is not merged (`github.event.pull_request.merged == false`).
+   - The job is now set to run if the pull request is not merged (`github.event.pull_request.merged == false`). This change ensures that the README updates and code reviews are performed before merging, which is typically when they are most needed.
+
 3. **Environment Variables**:
-   - Added `PR_BRANCH_NAME` to the list of environment variables passed to the Python script.
+   - Added `PR_BRANCH_NAME` to the list of environment variables. This allows the automation scripts to know the branch name of the pull request, which is useful for updating the README in the correct branch.
 
 ### Main Script Changes (`main.py`)
+
 1. **Environment Variable Extraction**:
-   - Added extraction of `PR_BRANCH_NAME`.
+   - The script now extracts the `PR_BRANCH_NAME` from the environment variables, allowing it to know the branch name of the pull request.
+   
 2. **Conditional Code Review**:
-   - Added condition to check if the only changed file is `README.md`. If not, perform the code review and update the README in the existing PR branch.
+   - The script now checks if the only changed file is `README.md`. If so, it skips adding code review comments to avoid unnecessary comments when only the README is updated.
+
+3. **README Update**:
+   - The `update_readme_in_existing_pr` function now uses the `PR_BRANCH_NAME` to update the README directly in the existing PR branch.
 
 ### Utility Script Changes (`utility.py`)
+
 1. **Review Prompt**:
-   - Updated the review prompt to exclude README update suggestions.
+   - The review prompt was updated to exclude README update suggestions. This helps in focusing the review comments on actual code changes.
+
 2. **Update README Function**:
-   - Modified `update_readme_in_existing_pr` to dynamically fetch the latest `README.md` SHA from the PR branch.
+   - The `update_readme_in_existing_pr` function was modified to dynamically fetch the latest `README.md` SHA from the PR branch. This ensures the script is always working with the latest version of the file.
+
 3. **New Functions**:
-   - Added `get_pr_labels` to retrieve labels associated with a PR.
-   - Added `merge_pull_request` to merge a specified PR.
-   - Added `notify_user_for_merge` to notify the user when the PR is ready to be merged.
+   - `get_pr_labels`: Retrieves labels associated with a PR.
+   - `merge_pull_request`: Merges a specified PR using the chosen method (merge, squash, or rebase).
+   - `notify_user_for_merge`: Notifies the user when the PR is ready to be merged.
 
 ### Commit Messages
-- The commit messages are clear and reflect the changes made in the code. They include additions and updates to the workflow, new functions for future automation features, and fine-tuning of prompts and conditions.
 
----
+- The commit messages are clear and descriptive, reflecting the changes made in the code. They include additions and updates to the workflow, new functions for future automation features, and fine-tuning of prompts and conditions.
 
 ## Updated README Content
 
@@ -112,4 +122,5 @@ This updated README provides a clear overview of the new workflow, functions, an
 ```
 
 ## Summary
+
 The code changes introduce new functionalities and improve the existing workflow for automated README updates and code reviews. The updated README accurately reflects these changes, providing clear instructions on setup, usage, and new features. The commit messages are well-documented and align with the changes made in the code.
