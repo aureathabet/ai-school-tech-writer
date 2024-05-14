@@ -54,7 +54,7 @@ def call_openai(prompt, context):
         # Adding context to our prompt
         embeddings = OpenAIEmbeddings(model=EMBEDDING_MODEL)
 
-        document_vectorstore = PineconeVectorStore(index_name=PINECONE_INDEX, embedding=embeddings)
+        document_vectorstore = PineconeVectorStore(pinecode_api_key=os.getenv("PINECONE_API_KEY"), index_name=PINECONE_INDEX, embedding=embeddings)
         retriever = document_vectorstore.as_retriever()
         context = retriever.get_relevant_documents(prompt)
 
