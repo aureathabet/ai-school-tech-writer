@@ -34,13 +34,19 @@ def main():
     commit_messages = [commit.commit.message for commit in pull_request.get_commits()]
 
     # Format data for OpenAI prompt
-    prompt = format_data_for_openai(pull_request_diffs, readme_content, commit_messages)
+    prompt_readme, prompt_review = format_data_for_openai(pull_request_diffs, readme_content, commit_messages)
 
     # Call OpenAI to generate the updated README content
-    updated_readme = call_openai(prompt)
+    updated_readme = call_openai(prompt_readme)
+
+    # Add code review comments
+    comment_body = call_openai(prompt_review)
+    add_code_review_comment(repo, pull_request_number, comment_body)
+
+    
 
     # Create PR for Updated PR
-    update_readme_and_create_pr(repo, updated_readme, readme_content.sha)
+    update_readme_in_existing_pr(repo, updated_readme, readme_content.sha)
 
 if __name__ == '__main__':
     main()
