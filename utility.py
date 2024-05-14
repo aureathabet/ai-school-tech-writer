@@ -63,7 +63,7 @@ def update_readme_in_existing_pr(repo, updated_readme, readme_sha, pr_branch_nam
     commit_message = "AI COMMIT: Proposed README update based on recent code changes."
 
     # Update the README.md file directly in the existing PR branch
-    repo.update_file("README.md", commit_message, updated_readme, readme_sha, branch=pr_branch_name)
+    repo.update_file("README.md", commit_message, updated_readme, readme_sha, pr_branch_name)
 
 def add_code_review_comment(repo, pr_number, comment_body):
     """
