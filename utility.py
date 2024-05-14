@@ -76,3 +76,18 @@ def add_code_review_comment(repo, pr_number, comment_body):
     """
     pull_request = repo.get_pull(pr_number)
     pull_request.create_issue_comment(comment_body)
+
+def get_pr_labels(repo, pr_number):
+    """
+    Retrieves the labels associated with a specified pull request.
+
+    Args:
+    repo (Repository): The repository object from the GitHub API.
+    pr_number (int): The number of the pull request from which to retrieve labels.
+
+    Returns:
+    list: A list of label names associated with the pull request.
+    """
+    pull_request = repo.get_pull(pr_number)
+    return [label.name for label in pull_request.labels]
+
