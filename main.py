@@ -44,7 +44,7 @@ def main():
     comment_body = call_openai(prompt_review)
     add_code_review_comment(repo, pull_request_number, comment_body)
 
-    # Create PR for Updated PR
+    # Create new commit for the README update
     update_readme_in_existing_pr(repo, updated_readme, readme_content.sha, pull_request_branch_name)
 
 if __name__ == '__main__':
