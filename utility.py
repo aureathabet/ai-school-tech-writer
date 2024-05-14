@@ -91,3 +91,24 @@ def get_pr_labels(repo, pr_number):
     pull_request = repo.get_pull(pr_number)
     return [label.name for label in pull_request.labels]
 
+def merge_pull_request(repo, pr_number, commit_title, commit_message, merge_method='merge'):
+    """
+    Merges a specified pull request.
+
+    Args:
+    repo (Repository): The repository object from the GitHub API.
+    pr_number (int): The number of the pull request to merge.
+    commit_title (str): The title for the commit message.
+    commit_message (str): The detailed commit message.
+    merge_method (str): The method of merging (merge, squash, or rebase).
+
+    Returns:
+    bool: True if the merge was successful, False otherwise.
+    """
+    try:
+        pull_request = repo.get_pull(pr_number)
+        pull_request.merge(commit_title=commit_title, commit_message=commit_message, merge_method=merge_method)
+        return True
+    except Exception as e:
+        print(f"Failed to merge PR: {e}")
+        return False
